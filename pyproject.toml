@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "awesome-minio"
+version = "1.0.0"
+license = "Apache-2.0"
+readme = "README.md"
+description = "minio wrapper to perform task like pandas dataframe upload, download"
+authors = ["Schwannden Kuo <schwannden@mobagel.com>"]
+homepage = "https://github.com/MoBagel/awesome-minio"
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: Internet",
+  "Topic :: Internet :: WWW/HTTP",
+]
+include = [
+  "README.md",
+  "LICENSE.txt",
+]
+
+[tool.poetry.dependencies]
+python = "~=3.8"
+minio = "^7.1.1"
+pandas = "^1.4.1"
+starlette = "^0.19.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+pytest-cov = "^3.0.0"
+black = "~=22.1.0"
+flake8 = "^4.0.0"
+isort = "^5.10.1"
+mypy = "^0.910"
+poethepoet = "^0.11.0"
+autoflake = "^1.4"
+coveralls = "^3.3.1"
+pytest-aiohttp = "^0.3.0"
+pydantic = "^1.9.0"
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.env]
+ROOT = 'awesome_minio'
+
+[tool.poe.tasks]
+mypy-install-type = 'mypy $ROOT --ignore-missing-imports --install-types --non-interactive'
+mypy = 'mypy $ROOT --ignore-missing-imports'
+autoflake-check = 'autoflake $ROOT -r'
+autoflake = 'autoflake --in-place $ROOT -r'
+isort-check = 'isort $ROOT --diff'
+isort = 'isort $ROOT'
+black-check = 'black $ROOT --diff'
+black = 'black $ROOT'
+format-check = ['autoflake-check', 'isort-check', 'black-check']
+format = ['autoflake', 'isort', 'black']
+lint = ['mypy-install-type', 'mypy', 'black-check']
+test = 'pytest --cov=$ROOT --cov-report term-missing'

@@ -1,4 +1,4 @@
-[![Stable Version](https://img.shields.io/pypi/v/awesome-minio?label=stable)](https://pypi.org/project/awesome-minio/)
+[![Stable Version](https://badge.fury.io/py/awesome-minio.svg)](https://pypi.org/project/awesome-minio/)
 [![tests](https://github.com/MoBagel/awesome-minio/workflows/develop/badge.svg)](https://github.com/MoBagel/awesome-minio)
 [![Coverage Status](https://coveralls.io/repos/github/MoBagel/awesome-minio/badge.svg?branch=develop)](https://coveralls.io/github/MoBagel/awesome-minio)
 

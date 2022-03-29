@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awesome-minio"
-version = "1.0.1"
+version = "1.0.2"
 license = "Apache-2.0"
 readme = "README.md"
 description = "minio wrapper to perform task like pandas dataframe upload, download"

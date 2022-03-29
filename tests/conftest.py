@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 
 from awesome_minio.minio import MinioStore
@@ -14,6 +16,8 @@ class TestSettings(BaseSettings):
     minio_secret_key: str = Field(default="minioadmin", env="MINIO_SECRET_KEY")
     minio_bucket: str = Field(default="test", env="MINIO_BUCKET")
     minio_host: str = Field(default="0.0.0.0:9000", env="MINIO_ADDRESS")
+    minio_secure: bool = Field(default=False, env="MINIO_SECURE")
+    minio_region: Optional[str] = Field(default=None, env="MINIO_REGION")
 
 
 @pytest.fixture
@@ -43,4 +47,6 @@ def minio_store(settings):
         bucket=settings.minio_bucket,
         access_key=settings.minio_access_key,
         secret_key=settings.minio_secret_key,
+        secure=settings.minio_secure,
+        region=settings.minio_region,
     )

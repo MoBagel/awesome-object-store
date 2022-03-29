@@ -178,9 +178,11 @@ class MinioStore:
 
     def remove_objects(self, names: list):
         """Remove objects."""
-        objects_to_delete = [DeleteObject(name) for name in names]
-        for del_err in self.client.remove_objects(self.bucket, objects_to_delete):
-            self.logger.warning("Deletion Error: %s", del_err)
+        for name in names:
+            try:
+                self.remove_object(name)
+            except Exception as e:
+                self.logger.warning("%s Deletion Error: %s", name, e)
 
     def download(self, name: str, file_path: str):
         """Downloads data of an object to file."""

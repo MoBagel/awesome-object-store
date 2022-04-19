@@ -1,3 +1,4 @@
+import csv
 import glob
 import json
 from io import BytesIO, StringIO
@@ -121,9 +122,11 @@ class MinioStore:
         """Remove an object."""
         self.client.remove_object(self.bucket, name)
 
-    def upload_df(self, name: str, data: pd.DataFrame):
+    def upload_df(
+        self, name: str, data: pd.DataFrame, index=False, quoting=csv.QUOTE_MINIMAL
+    ):
         """Uploads data from a pandas dataframe to an object in a bucket."""
-        data_bytes = data.to_csv(index=False).encode("utf-8")
+        data_bytes = data.to_csv(index=index, quoting=quoting).encode("utf-8")
         data_byte_stream = BytesIO(data_bytes)
 
         self.put(name, data_byte_stream, content_type="application/csv")

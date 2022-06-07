@@ -1,7 +1,7 @@
 import csv
 import json
 from abc import ABC, abstractmethod
-from io import StringIO
+from io import BytesIO, StringIO
 from logging import Logger
 from typing import IO, List, Optional
 
@@ -15,16 +15,24 @@ class BaseObjectStorage(ABC):
     logger: Logger
 
     @abstractmethod
+    def create_bucket(self, bucket_name: str):
+        pass
+
+    @abstractmethod
+    def bucket_exists(self, bucket_name: str) -> bool:
+        pass
+
+    @abstractmethod
     def list_buckets(self):
         pass
 
     @abstractmethod
     def list_objects(self, prefix: str = None, recursive: bool = False):
-        """Lists object information of a bucket with text."""
+        pass
 
     @abstractmethod
     def fput(self, name: str, file_path: str, exclude_files: List[str] = []):
-        """Uploads data from a file/folder to an object in a bucket."""
+        pass
 
     @abstractmethod
     def put(
@@ -34,37 +42,46 @@ class BaseObjectStorage(ABC):
         length: Optional[int] = None,
         content_type: str = "application/octet-stream",
     ):
-        """Uploads data from a stream to an object in a bucket."""
-
-    @abstractmethod
-    def put_as_json(self, name: str, data: dict):
-        """Uploads data from a json to an object in a bucket."""
+        pass
 
     @abstractmethod
     def get(self, name: str):
-        """Gets data of an object."""
+        pass
 
     @abstractmethod
     def exists(self, name: str) -> bool:
-        """Check if object or bucket exist."""
-
-    @abstractmethod
-    def remove_dir(self, folder: str):
-        """Remove folder."""
+        pass
 
     @abstractmethod
     def remove_object(self, name: str):
-        """Remove an object."""
+        pass
 
     @abstractmethod
+    def download(self, name: str, file_path: str):
+        pass
+
+    def remove_dir(self, folder: str):
+        """Remove folder."""
+        self.logger.warning("removing %s", folder)
+        objects_to_delete = self.list_objects(prefix=folder, recursive=True)
+        self.logger.warning("Removing: %s", objects_to_delete)
+        self.remove_objects(objects_to_delete)
+
     def upload_df(
         self, name: str, data: pd.DataFrame, index=False, quoting=csv.QUOTE_MINIMAL
     ):
         """Uploads data from a pandas dataframe to an object in a bucket."""
+        data_bytes = data.to_csv(index=index, quoting=quoting).encode("utf-8")
+        data_byte_stream = BytesIO(data_bytes)
 
-    @abstractmethod
-    def download(self, name: str, file_path: str):
-        """Downloads data of an object to file."""
+        self.put(name, data_byte_stream, content_type="application/csv")
+
+    def put_as_json(self, name: str, data: dict):
+        """Uploads data from a json to an object in a bucket."""
+        data_bytes = json.dumps(data).encode("utf-8")
+        data_byte_stream = BytesIO(data_bytes)
+
+        self.put(name, data_byte_stream, content_type="application/json")
 
     def fget_df(
         self,

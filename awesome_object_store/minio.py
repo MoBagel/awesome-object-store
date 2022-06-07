@@ -1,14 +1,10 @@
-import csv
 import glob
-import json
-from io import BytesIO
 from logging import Logger
 from os import path
 from pathlib import Path
 from typing import IO, List, Optional
 
-import pandas as pd
-from minio import Minio, S3Error
+from minio import Minio
 
 from awesome_object_store.base import BaseObjectStorage
 
@@ -35,12 +31,18 @@ class MinioStore(BaseObjectStorage):
             region=region,
         )
         self.logger = logger if logger is not None else Logger("minio")
-        found = self.client.bucket_exists(self.bucket)
+        found = self.bucket_exists(self.bucket)
         if not found:
             self.logger.warning("bucket not exist, creating it")
-            self.client.make_bucket(self.bucket)
+            self.create_bucket(self.bucket)
         else:
             self.logger.info("bucket '%s' exists", self.bucket)
+
+    def create_bucket(self, bucket_name: str):
+        self.client.make_bucket(bucket_name)
+
+    def bucket_exists(self, bucket_name: str) -> bool:
+        return self.client.bucket_exists(bucket_name)
 
     def list_buckets(self):
         """List information of all accessible buckets with text."""
@@ -90,13 +92,6 @@ class MinioStore(BaseObjectStorage):
             self.bucket, name, data, length, content_type=content_type
         )
 
-    def put_as_json(self, name: str, data: dict):
-        """Uploads data from a json to an object in a bucket."""
-        data_bytes = json.dumps(data).encode("utf-8")
-        data_byte_stream = BytesIO(data_bytes)
-
-        self.put(name, data_byte_stream, content_type="application/json")
-
     def get(self, name: str):
         """Gets data of an object."""
         return self.client.get_object(self.bucket, name)
@@ -109,54 +104,9 @@ class MinioStore(BaseObjectStorage):
         except Exception:
             return False
 
-    def remove_dir(self, folder: str):
-        """Remove folder."""
-        self.logger.warning("removing %s", folder)
-        objects_to_delete = self.list_objects(prefix=folder, recursive=True)
-        self.logger.warning("Removing: %s", objects_to_delete)
-        self.remove_objects(objects_to_delete)
-
     def remove_object(self, name: str):
         """Remove an object."""
         self.client.remove_object(self.bucket, name)
-
-    def upload_df(
-        self, name: str, data: pd.DataFrame, index=False, quoting=csv.QUOTE_MINIMAL
-    ):
-        """Uploads data from a pandas dataframe to an object in a bucket."""
-        data_bytes = data.to_csv(index=index, quoting=quoting).encode("utf-8")
-        data_byte_stream = BytesIO(data_bytes)
-
-        self.put(name, data_byte_stream, content_type="application/csv")
-
-    def get_df(
-        self,
-        name: str,
-        column_types: dict = {},
-        date_columns: List[str] = [],
-    ) -> Optional[pd.DataFrame]:
-        """Gets data of an object and return a dataframe."""
-        try:
-            file_obj = self.get(name)
-        except S3Error as e:
-            self.logger.warning(e)
-            return None
-
-        if not date_columns:
-            df = pd.read_csv(file_obj, dtype=column_types)
-        else:
-            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
-        file_obj.close()
-        file_obj.release_conn()
-        return df
-
-    def remove_objects(self, names: list):
-        """Remove objects."""
-        for name in names:
-            try:
-                self.remove_object(name)
-            except Exception as e:
-                self.logger.warning("%s Deletion Error: %s", name, e)
 
     def download(self, name: str, file_path: str):
         """Downloads data of an object to file."""

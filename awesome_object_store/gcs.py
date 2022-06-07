@@ -1,0 +1,107 @@
+import glob
+from io import BytesIO
+from logging import Logger
+from os import path
+from pathlib import Path
+from typing import IO, List, Optional
+
+from google.cloud.storage import Blob, Client
+
+from awesome_object_store.base import BaseObjectStorage
+
+
+class GoogleCloudStore(BaseObjectStorage):
+    client: Client
+
+    def __init__(
+        self,
+        bucket: str,
+        logger: Optional[Logger] = None,
+    ):
+        self.bucket = bucket
+        self.client = Client()
+        self.logger = logger if logger is not None else Logger("minio")
+        found = self.client.bucket(self.bucket).exists()
+        if not found:
+            self.logger.warning("bucket not exist, creating it")
+            self.create_bucket(self.bucket)
+        else:
+            self.logger.info("bucket '%s' exists", self.bucket)
+
+    def create_bucket(self, bucket_name: str):
+        self.client.create_bucket(bucket_name)
+
+    def bucket_exists(self, bucket_name: str) -> bool:
+        return self.client.bucket(bucket_name).exists()
+
+    def list_buckets(self):
+        """List information of all accessible buckets with text."""
+        return [x.name for x in self.client.list_buckets()]
+
+    def list_objects(self, prefix: str = None, recursive: bool = False):
+        """Lists object information of a bucket with text."""
+        delimiter = "/" if recursive else None
+        return [
+            x.object_name
+            for x in self.client.list_blobs(
+                self.bucket, prefix=prefix, delimiter=delimiter
+            )
+        ]
+
+    def fput(self, name: str, file_path: str, exclude_files: List[str] = []):
+        """Uploads data from a file/folder to an object in a bucket."""
+        if path.isdir(file_path):
+            for local_file in glob.glob(file_path + "/**"):
+                file_name = Path(local_file).name
+                remote_path = path.join(name, file_name)
+
+                if file_name in exclude_files:
+                    self.logger.info(f"exclude: {local_file}")
+                    continue
+
+                if not path.isfile(local_file):
+                    self.fput(remote_path, local_file, exclude_files)
+                else:
+                    remote_path = path.join(name, local_file[1 + len(file_path) :])
+                    blob: Blob = self.client.bucket(self.bucket).blob(remote_path)
+                    blob.upload_from_filename(local_file)
+        else:
+            blob: Blob = self.client.bucket(self.bucket).blob(name)
+            blob.upload_from_filename(file_path)
+
+    def put(
+        self,
+        name: str,
+        data: IO,
+        length: Optional[int] = None,
+        content_type: str = "application/octet-stream",
+    ):
+        """Uploads data from a stream to an object in a bucket."""
+        if not length:
+            data.seek(0)
+
+        blob: Blob = self.client.bucket(self.bucket).blob(name)
+        blob.upload_from_file(data)
+
+    def get(self, name: str):
+        """Gets data of an object."""
+        file_obj = BytesIO()
+        blob: Blob = self.client.bucket(self.bucket).blob(name)
+        blob.download_to_file(file_obj)
+        file_obj.seek(0)
+        return file_obj
+
+    def exists(self, name: str) -> bool:
+        """Check if object or bucket exist."""
+        blob: Blob = self.client.bucket(self.bucket).get_blob(name)
+        return False if blob is None else True
+
+    def remove_object(self, name: str):
+        """Remove an object."""
+        blob: Blob = self.client.bucket(self.bucket).blob(name)
+        blob.delete()
+
+    def download(self, name: str, file_path: str):
+        """Downloads data of an object to file."""
+        blob: Blob = self.client.bucket(self.bucket).blob(name)
+        blob.download_to_filename(file_path)

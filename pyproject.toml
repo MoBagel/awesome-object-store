@@ -51,7 +51,7 @@ requires = ["poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poe.env]
-ROOT = 'awesome_minio'
+ROOT = 'awesome_object_store'
 
 [tool.poe.tasks]
 mypy-install-type = 'mypy $ROOT --ignore-missing-imports --install-types --non-interactive'

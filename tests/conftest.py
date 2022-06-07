@@ -2,7 +2,7 @@ from typing import Optional
 
 import pytest
 
-from awesome_minio.minio import MinioStore
+from awesome_object_store.minio import MinioStore
 from tests import generate_fake_dataframe
 from pydantic import BaseSettings, Field
 

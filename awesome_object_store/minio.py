@@ -1,7 +1,7 @@
 import csv
 import glob
 import json
-from io import BytesIO, StringIO
+from io import BytesIO
 from logging import Logger
 from os import path
 from pathlib import Path
@@ -9,14 +9,12 @@ from typing import IO, List, Optional
 
 import pandas as pd
 from minio import Minio, S3Error
-from minio.deleteobjects import DeleteObject
-from starlette.datastructures import UploadFile
+
+from awesome_object_store.base import BaseObjectStorage
 
 
-class MinioStore:
-    bucket: str
+class MinioStore(BaseObjectStorage):
     client: Minio
-    logger: Logger
 
     def __init__(
         self,
@@ -130,33 +128,6 @@ class MinioStore:
         data_byte_stream = BytesIO(data_bytes)
 
         self.put(name, data_byte_stream, content_type="application/csv")
-
-    def fget_df(
-        self,
-        file: UploadFile,
-        column_types: dict = {},
-        date_columns: List[str] = [],
-    ) -> Optional[pd.DataFrame]:
-        try:
-            file_io = StringIO(str(file.file.read(), "utf-8"))
-            df = pd.read_csv(file_io, dtype=column_types, parse_dates=date_columns)
-            file_io.close()
-        except Exception as e:
-            self.logger.warning("unable to read csv %s" % str(e))
-            return None
-        return df
-
-    def get_json(self, name: str) -> dict:
-        """Gets data of an object and return a json."""
-        try:
-            file_obj = self.get(name)
-        except S3Error as e:
-            self.logger.warning(e)
-            return {}
-        result = json.load(file_obj)
-        file_obj.close()
-        file_obj.release_conn()
-        return result
 
     def get_df(
         self,

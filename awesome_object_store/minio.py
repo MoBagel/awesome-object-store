@@ -1,10 +1,12 @@
 import glob
+import json
 from logging import Logger
 from os import path
 from pathlib import Path
 from typing import IO, List, Optional
 
-from minio import Minio
+import pandas as pd
+from minio import Minio, S3Error
 
 from awesome_object_store.base import BaseObjectStorage
 
@@ -95,6 +97,39 @@ class MinioStore(BaseObjectStorage):
     def get(self, name: str):
         """Gets data of an object."""
         return self.client.get_object(self.bucket, name)
+
+    def get_df(
+        self,
+        name: str,
+        column_types: dict = {},
+        date_columns: List[str] = [],
+    ) -> Optional[pd.DataFrame]:
+        """Gets data of an object and return a dataframe."""
+        try:
+            file_obj = self.get(name)
+        except S3Error as e:
+            self.logger.warning(e)
+            return None
+
+        if not date_columns:
+            df = pd.read_csv(file_obj, dtype=column_types)
+        else:
+            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
+        file_obj.close()
+        file_obj.release_conn()
+        return df
+
+    def get_json(self, name: str) -> dict:
+        """Gets data of an object and return a json."""
+        try:
+            file_obj = self.get(name)
+        except S3Error as e:
+            self.logger.warning(e)
+            return {}
+        result = json.load(file_obj)
+        file_obj.close()
+        file_obj.release_conn()
+        return result
 
     def exists(self, name: str) -> bool:
         """Check if object or bucket exist."""

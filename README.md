@@ -17,3 +17,12 @@ A library that extends minio python client to perform more complex task like rea
 * get_df: Get a dataframe from a csv object on s3.
 * remove_objects: Remove objects.
 * download: Downloads data of an object to file.
+
+# Development
+## run unit test
+1. getting service account credential:
+   1.visit google cloud console
+   2.go to project 8ndpoint-datalake-dev -> Security -> Secret Manager -> awesome-object-store-unit-test
+   3.action -> view secret value
+   4.store the value in tests/service-account.json
+2. run ./run_test.sh

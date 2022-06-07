@@ -60,6 +60,19 @@ class BaseObjectStorage(ABC):
     def download(self, name: str, file_path: str):
         pass
 
+    @abstractmethod
+    def get_df(
+        self,
+        name: str,
+        column_types: dict = {},
+        date_columns: List[str] = [],
+    ) -> Optional[pd.DataFrame]:
+        pass
+
+    @abstractmethod
+    def get_json(self, name: str) -> dict:
+        pass
+
     def remove_dir(self, folder: str):
         """Remove folder."""
         self.logger.warning("removing %s", folder)
@@ -96,39 +109,6 @@ class BaseObjectStorage(ABC):
         except Exception as e:
             self.logger.warning("unable to read csv %s" % str(e))
             return None
-        return df
-
-    def get_json(self, name: str) -> dict:
-        """Gets data of an object and return a json."""
-        try:
-            file_obj = self.get(name)
-        except S3Error as e:
-            self.logger.warning(e)
-            return {}
-        result = json.load(file_obj)
-        file_obj.close()
-        file_obj.release_conn()
-        return result
-
-    def get_df(
-        self,
-        name: str,
-        column_types: dict = {},
-        date_columns: List[str] = [],
-    ) -> Optional[pd.DataFrame]:
-        """Gets data of an object and return a dataframe."""
-        try:
-            file_obj = self.get(name)
-        except S3Error as e:
-            self.logger.warning(e)
-            return None
-
-        if not date_columns:
-            df = pd.read_csv(file_obj, dtype=column_types)
-        else:
-            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
-        file_obj.close()
-        file_obj.release_conn()
         return df
 
     def remove_objects(self, names: list):

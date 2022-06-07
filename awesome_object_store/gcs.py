@@ -1,10 +1,13 @@
 import glob
+import json
 from io import BytesIO
 from logging import Logger
 from os import path
 from pathlib import Path
 from typing import IO, List, Optional
 
+import pandas as pd
+from google.api_core.exceptions import NotFound
 from google.cloud.storage import Blob, Client
 
 from awesome_object_store.base import BaseObjectStorage
@@ -42,7 +45,7 @@ class GoogleCloudStore(BaseObjectStorage):
         """Lists object information of a bucket with text."""
         delimiter = "/" if recursive else None
         return [
-            x.object_name
+            x.name
             for x in self.client.list_blobs(
                 self.bucket, prefix=prefix, delimiter=delimiter
             )
@@ -86,10 +89,38 @@ class GoogleCloudStore(BaseObjectStorage):
     def get(self, name: str):
         """Gets data of an object."""
         file_obj = BytesIO()
-        blob: Blob = self.client.bucket(self.bucket).blob(name)
+        blob = self.client.bucket(self.bucket).blob(name)
         blob.download_to_file(file_obj)
         file_obj.seek(0)
         return file_obj
+
+    def get_json(self, name: str) -> dict:
+        """Gets data of an object and return a json."""
+        try:
+            file_obj = self.get(name)
+        except NotFound as e:
+            self.logger.warning(e)
+            return {}
+        result = json.load(file_obj)
+        return result
+
+    def get_df(
+        self,
+        name: str,
+        column_types: dict = {},
+        date_columns: List[str] = [],
+    ) -> Optional[pd.DataFrame]:
+        """Gets data of an object and return a dataframe."""
+        try:
+            file_obj = self.get(name)
+        except NotFound as e:
+            self.logger.warning(e)
+            return None
+        if not date_columns:
+            df = pd.read_csv(file_obj, dtype=column_types)
+        else:
+            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
+        return df
 
     def exists(self, name: str) -> bool:
         """Check if object or bucket exist."""

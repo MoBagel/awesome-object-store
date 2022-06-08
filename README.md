@@ -21,8 +21,8 @@ A library that extends minio python client to perform more complex task like rea
 # Development
 ## run unit test
 1. getting service account credential:
-   1.visit google cloud console
-   2.go to project 8ndpoint-datalake-dev -> Security -> Secret Manager -> awesome-object-store-unit-test
-   3.action -> view secret value
-   4.store the value in tests/service-account.json
+   1. visit google cloud console
+   1. go to project 8ndpoint-datalake-dev -> Security -> Secret Manager -> awesome-object-store-unit-test
+   1. action -> view secret value
+   1. store the value in tests/service-account.json
 2. run ./run_test.sh

@@ -8,18 +8,18 @@ from typing import IO, List, Optional
 import pandas as pd
 from minio import Minio, S3Error
 
-from awesome_object_store.base import BaseObjectStorage
+from awesome_object_store.base import BaseObjectStore
 
 
-class MinioStore(BaseObjectStorage):
+class MinioStore(BaseObjectStore):
     client: Minio
 
     def __init__(
         self,
-        host: str,
         bucket: str,
-        access_key: str,
-        secret_key: str,
+        host: str = None,
+        access_key: str = None,
+        secret_key: str = None,
         secure: bool = False,
         region: Optional[str] = None,
         logger: Optional[Logger] = None,

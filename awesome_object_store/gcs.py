@@ -10,10 +10,10 @@ import pandas as pd
 from google.api_core.exceptions import NotFound
 from google.cloud.storage import Blob, Client
 
-from awesome_object_store.base import BaseObjectStorage
+from awesome_object_store.base import BaseObjectStore
 
 
-class GoogleCloudStore(BaseObjectStorage):
+class GoogleCloudStore(BaseObjectStore):
     client: Client
 
     def __init__(
@@ -69,7 +69,7 @@ class GoogleCloudStore(BaseObjectStorage):
                     blob: Blob = self.client.bucket(self.bucket).blob(remote_path)
                     blob.upload_from_filename(local_file)
         else:
-            blob: Blob = self.client.bucket(self.bucket).blob(name)
+            blob = self.client.bucket(self.bucket).blob(name)
             blob.upload_from_filename(file_path)
 
     def put(

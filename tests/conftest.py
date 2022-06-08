@@ -1,7 +1,6 @@
 from typing import Optional
 
 import pytest
-from google.cloud import storage
 
 from awesome_object_store import GoogleCloudStore
 from awesome_object_store.minio import MinioStore
@@ -56,7 +55,7 @@ def minio_store(settings):
 
 @pytest.fixture
 def google_application_credentials():
-    return "./tests/service-account-file.json"
+    return "./tests/service-account.json"
 
 @pytest.fixture
 def google_cloud_store(monkeypatch, google_application_credentials, settings):

@@ -6,11 +6,10 @@ from logging import Logger
 from typing import IO, List, Optional
 
 import pandas as pd
-from minio import S3Error
 from starlette.datastructures import UploadFile
 
 
-class BaseObjectStorage(ABC):
+class BaseObjectStore(ABC):
     bucket: str
     logger: Logger
 

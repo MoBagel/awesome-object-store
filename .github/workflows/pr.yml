@@ -41,10 +41,14 @@ jobs:
           export MINIO_ACCESS_KEY=minio
           export MINIO_SECRET_KEY=minio123
           export MINIO_ADDRESS=0.0.0.0:9000
+          cat > tests/service-account.json << EOF
+          $SERVICE_ACCOUNT_JSON
+          EOF
           tests/minio server /tmp/fs --address $MINIO_ADDRESS >tests/minio.log 2>&1 &
           poetry run poe test
 
       - name: Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         run: poetry run coveralls

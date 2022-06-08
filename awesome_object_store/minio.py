@@ -7,11 +7,13 @@ from typing import IO, List, Optional
 
 import pandas as pd
 from minio import Minio, S3Error
+from minio.datatypes import Bucket
+from urllib3 import HTTPResponse
 
 from awesome_object_store.base import BaseObjectStore
 
 
-class MinioStore(BaseObjectStore):
+class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
     client: Minio
 
     def __init__(

@@ -8,12 +8,12 @@ from typing import IO, List, Optional
 
 import pandas as pd
 from google.api_core.exceptions import NotFound
-from google.cloud.storage import Blob, Client
+from google.cloud.storage import Blob, Bucket, Client
 
 from awesome_object_store.base import BaseObjectStore
 
 
-class GoogleCloudStore(BaseObjectStore):
+class GoogleCloudStore(BaseObjectStore[Bucket, Blob]):
     client: Client
 
     def __init__(

@@ -6,7 +6,7 @@ from starlette.datastructures import UploadFile
 
 def test_bucket_creation(minio_store):
     buckets = minio_store.list_buckets()
-    assert "test" in buckets
+    assert "8ndpoint-test-dev" in buckets
 
 
 def test_fput(minio_store, test_string):

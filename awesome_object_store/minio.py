@@ -1,7 +1,5 @@
-import csv
 import glob
 import json
-from io import BytesIO, StringIO
 from logging import Logger
 from os import path
 from pathlib import Path
@@ -9,21 +7,21 @@ from typing import IO, List, Optional
 
 import pandas as pd
 from minio import Minio, S3Error
-from minio.deleteobjects import DeleteObject
-from starlette.datastructures import UploadFile
+from minio.datatypes import Bucket
+from urllib3 import HTTPResponse
+
+from awesome_object_store.base import BaseObjectStore
 
 
-class MinioStore:
-    bucket: str
+class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
     client: Minio
-    logger: Logger
 
     def __init__(
         self,
-        host: str,
         bucket: str,
-        access_key: str,
-        secret_key: str,
+        host: str = None,
+        access_key: str = None,
+        secret_key: str = None,
         secure: bool = False,
         region: Optional[str] = None,
         logger: Optional[Logger] = None,
@@ -37,12 +35,18 @@ class MinioStore:
             region=region,
         )
         self.logger = logger if logger is not None else Logger("minio")
-        found = self.client.bucket_exists(self.bucket)
+        found = self.bucket_exists(self.bucket)
         if not found:
             self.logger.warning("bucket not exist, creating it")
-            self.client.make_bucket(self.bucket)
+            self.create_bucket(self.bucket)
         else:
             self.logger.info("bucket '%s' exists", self.bucket)
+
+    def create_bucket(self, bucket_name: str):
+        self.client.make_bucket(bucket_name)
+
+    def bucket_exists(self, bucket_name: str) -> bool:
+        return self.client.bucket_exists(bucket_name)
 
     def list_buckets(self):
         """List information of all accessible buckets with text."""
@@ -92,71 +96,9 @@ class MinioStore:
             self.bucket, name, data, length, content_type=content_type
         )
 
-    def put_as_json(self, name: str, data: dict):
-        """Uploads data from a json to an object in a bucket."""
-        data_bytes = json.dumps(data).encode("utf-8")
-        data_byte_stream = BytesIO(data_bytes)
-
-        self.put(name, data_byte_stream, content_type="application/json")
-
     def get(self, name: str):
         """Gets data of an object."""
         return self.client.get_object(self.bucket, name)
-
-    def exists(self, name: str) -> bool:
-        """Check if object or bucket exist."""
-        try:
-            self.client.stat_object(self.bucket, name)
-            return True
-        except Exception:
-            return False
-
-    def remove_dir(self, folder: str):
-        """Remove folder."""
-        self.logger.warning("removing %s", folder)
-        objects_to_delete = self.list_objects(prefix=folder, recursive=True)
-        self.logger.warning("Removing: %s", objects_to_delete)
-        self.remove_objects(objects_to_delete)
-
-    def remove_object(self, name: str):
-        """Remove an object."""
-        self.client.remove_object(self.bucket, name)
-
-    def upload_df(
-        self, name: str, data: pd.DataFrame, index=False, quoting=csv.QUOTE_MINIMAL
-    ):
-        """Uploads data from a pandas dataframe to an object in a bucket."""
-        data_bytes = data.to_csv(index=index, quoting=quoting).encode("utf-8")
-        data_byte_stream = BytesIO(data_bytes)
-
-        self.put(name, data_byte_stream, content_type="application/csv")
-
-    def fget_df(
-        self,
-        file: UploadFile,
-        column_types: dict = {},
-        date_columns: List[str] = [],
-    ) -> Optional[pd.DataFrame]:
-        try:
-            file_io = StringIO(str(file.file.read(), "utf-8"))
-            df = pd.read_csv(file_io, dtype=column_types, parse_dates=date_columns)
-            file_io.close()
-        except Exception as e:
-            self.logger.warning("unable to read csv %s" % str(e))
-            return None
-        return df
-
-    def get_json(self, name: str) -> dict:
-        """Gets data of an object and return a json."""
-        try:
-            file_obj = self.get(name)
-        except S3Error as e:
-            self.logger.warning(e)
-            return {}
-        result = json.load(file_obj)
-        file_obj.close()
-        file_obj.release_conn()
-        return result
 
     def get_df(
         self,
@@ -179,13 +121,29 @@ class MinioStore:
         file_obj.release_conn()
         return df
 
-    def remove_objects(self, names: list):
-        """Remove objects."""
-        for name in names:
-            try:
-                self.remove_object(name)
-            except Exception as e:
-                self.logger.warning("%s Deletion Error: %s", name, e)
+    def get_json(self, name: str) -> dict:
+        """Gets data of an object and return a json."""
+        try:
+            file_obj = self.get(name)
+        except S3Error as e:
+            self.logger.warning(e)
+            return {}
+        result = json.load(file_obj)
+        file_obj.close()
+        file_obj.release_conn()
+        return result
+
+    def exists(self, name: str) -> bool:
+        """Check if object or bucket exist."""
+        try:
+            self.client.stat_object(self.bucket, name)
+            return True
+        except Exception:
+            return False
+
+    def remove_object(self, name: str):
+        """Remove an object."""
+        self.client.remove_object(self.bucket, name)
 
     def download(self, name: str, file_path: str):
         """Downloads data of an object to file."""

@@ -14,5 +14,6 @@ dist
 coverage.xml
 tests/minio
 tests/minio.log
-.coverage*
+tests/service-account.json
 
+.coverage*

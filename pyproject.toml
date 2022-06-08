@@ -5,7 +5,7 @@ license = "Apache-2.0"
 readme = "README.md"
 description = "minio wrapper to perform task like pandas dataframe upload, download"
 authors = ["Schwannden Kuo <schwannden@mobagel.com>"]
-homepage = "https://github.com/MoBagel/awesome_object_store"
+homepage = "https://github.com/MoBagel/awesome-object-store"
 classifiers = [
   "Development Status :: 1 - Planning",
   "Intended Audience :: Developers",

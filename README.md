@@ -1,8 +1,8 @@
-[![Stable Version](https://badge.fury.io/py/awesome_object_store.svg)](https://pypi.org/project/awesome_object_store/)
-[![tests](https://github.com/MoBagel/awesome_object_store/workflows/develop/badge.svg)](https://github.com/MoBagel/awesome_object_store)
-[![Coverage Status](https://coveralls.io/repos/github/MoBagel/awesome_object_store/badge.svg?branch=develop)](https://coveralls.io/github/MoBagel/awesome_object_store)
+[![Stable Version](https://badge.fury.io/py/awesome-object-store.svg)](https://pypi.org/project/awesome-object-store/)
+[![tests](https://github.com/MoBagel/awesome-object-store/workflows/develop/badge.svg)](https://github.com/MoBagel/awesome-object-store)
+[![Coverage Status](https://coveralls.io/repos/github/MoBagel/awesome-object-store/badge.svg?branch=develop)](https://coveralls.io/github/MoBagel/awesome-object-store)
 
-# Awesome Minio
+# Awesome Object Store 
 
 A library that extends minio python client to perform more complex task like read/write pandas DataFrame, json file, ...etc
 

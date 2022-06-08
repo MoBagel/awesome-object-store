@@ -5,5 +5,5 @@ blank_issues_enabled: true
 
 contact_links:
   - name: Create Your Issues
-    url: https://github.com/MoBagel/awesome_object_store/issues
+    url: https://github.com/MoBagel/awesome-object-store/issues
     about: User support, questions, bugfixes.

@@ -43,13 +43,15 @@ class GoogleCloudStore(BaseObjectStore[Bucket, Blob]):
 
     def list_objects(self, prefix: str = None, recursive: bool = False):
         """Lists object information of a bucket with text."""
-        delimiter = "/" if recursive else None
-        return [
-            x.name
-            for x in self.client.list_blobs(
-                self.bucket, prefix=prefix, delimiter=delimiter
-            )
-        ]
+        delimiter = None if recursive else "/"
+        include_trailing_delimiter = True if delimiter else False
+        blobs = self.client.list_blobs(
+            self.bucket,
+            prefix=prefix,
+            delimiter=delimiter,
+            include_trailing_delimiter=include_trailing_delimiter,
+        )
+        return [b.name for b in blobs if b.name != prefix]
 
     def fput(self, name: str, file_path: str, exclude_files: List[str] = []):
         """Uploads data from a file/folder to an object in a bucket."""

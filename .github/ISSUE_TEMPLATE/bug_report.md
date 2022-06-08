@@ -40,7 +40,7 @@ The resulting error is:
 
 <!-- Please complete the following information: -->
 
-- awesome-minio version: <!-- e.g. [main] -->
+- awesome_object_store version: <!-- e.g. [main] -->
 - OS and Python version: <!-- e.g. [Linux/Python 3.7.4rc1] -->
 
 **Additional context**

@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "awesome-minio"
-version = "1.0.3"
+name = "awesome-object-store"
+version = "1.0.0"
 license = "Apache-2.0"
 readme = "README.md"
 description = "minio wrapper to perform task like pandas dataframe upload, download"
 authors = ["Schwannden Kuo <schwannden@mobagel.com>"]
-homepage = "https://github.com/MoBagel/awesome-minio"
+homepage = "https://github.com/MoBagel/awesome_object_store"
 classifiers = [
   "Development Status :: 1 - Planning",
   "Intended Audience :: Developers",

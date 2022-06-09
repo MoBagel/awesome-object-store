@@ -41,13 +41,21 @@ class GoogleCloudStore(BaseObjectStore[Bucket, Blob]):
         """List information of all accessible buckets with text."""
         return [x.name for x in self.client.list_buckets()]
 
-    def list_objects(self, prefix: str = None, recursive: bool = False):
+    def list_objects(
+        self,
+        prefix: str = None,
+        recursive: bool = False,
+        start_offset: Optional[str] = None,
+        end_offset: Optional[str] = None,
+    ):
         """Lists object information of a bucket with text."""
         delimiter = None if recursive else "/"
         blobs = self.client.list_blobs(
             self.bucket,
             prefix=prefix,
             delimiter=delimiter,
+            start_offset=start_offset,
+            end_offset=end_offset,
         )
         objects = []
         for blob in blobs:

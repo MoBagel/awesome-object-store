@@ -116,9 +116,11 @@ async def test_fget_df(google_cloud_store, test_dataframe):
         df = google_cloud_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df is None
 
+
 async def test_list_objects_with_invalid_args(google_cloud_store,test_dict):
     for i in range(6):
         google_cloud_store.put_as_json(f"XD/{i}.json", test_dict)
     blobs = google_cloud_store.list_objects("XD/", start_offset="XD/1", end_offset="XD/4")
-    assert blobs == ['XD/1.json', 'XD/2.json', 'XD/3.json']
+    for blob in blobs:
+        assert blob in ['XD/1.json', 'XD/2.json', 'XD/3.json']
     google_cloud_store.remove_dir("XD/")

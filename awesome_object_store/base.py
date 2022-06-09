@@ -30,7 +30,11 @@ class BaseObjectStore(Generic[BucketType, BlobType], ABC):
 
     @abstractmethod
     def list_objects(
-        self, prefix: str = None, recursive: bool = False
+        self,
+        prefix: str = None,
+        recursive: bool = False,
+        start_offset: Optional[str] = None,
+        end_offset: Optional[str] = None,
     ) -> List[BlobType]:
         pass
 

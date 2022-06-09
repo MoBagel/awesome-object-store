@@ -52,8 +52,16 @@ class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
         """List information of all accessible buckets with text."""
         return [x.name for x in self.client.list_buckets()]
 
-    def list_objects(self, prefix: str = None, recursive: bool = False):
+    def list_objects(
+        self,
+        prefix: str = None,
+        recursive: bool = False,
+        start_offset: Optional[str] = None,
+        end_offset: Optional[str] = None,
+    ):
         """Lists object information of a bucket with text."""
+        if start_offset is not None or end_offset is not None:
+            raise Exception("Minio client does not support start_offset or end_offset.")
         return [
             x.object_name
             for x in self.client.list_objects(

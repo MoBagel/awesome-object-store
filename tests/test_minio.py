@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+import pytest
 from starlette.datastructures import UploadFile
 
 
@@ -105,3 +106,8 @@ async def test_fget_df(minio_store, test_dataframe):
         upload_file = UploadFile("non_exist")
         df = minio_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df is None
+
+
+async def test_list_objects_with_invalid_args(minio_store,test_dict):
+    with pytest.raises(Exception):
+        minio_store.list_objects("", start_offset="2", end_offset="4")

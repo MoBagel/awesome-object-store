@@ -1,6 +1,6 @@
 [![Stable Version](https://badge.fury.io/py/awesome-object-store.svg)](https://pypi.org/project/awesome-object-store/)
 [![tests](https://github.com/MoBagel/awesome-object-store/workflows/develop/badge.svg)](https://github.com/MoBagel/awesome-object-store)
-[![Coverage Status](https://coveralls.io/repos/github/MoBagel/awesome-object-store/badge.svg?branch=develop)](https://coveralls.io/github/MoBagel/awesome-object-store)
+[![Coverage Status](https://coveralls.io/repos/github/MoBagel/awesome-object-store/badge.svg?branch=develop)](https://coveralls.io/github/MoBagel/awesome-object-store?branch=develop)
 
 # Awesome Object Store 
 

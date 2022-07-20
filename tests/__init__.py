@@ -105,7 +105,7 @@ def generate_fake_dataframe(size, cols, col_names=None, intervals=None, seed=Non
     else:
         if isinstance(intervals, dict):
             assert (
-                    len(set(intervals.keys()) - set(default_intervals.keys())) == 0
+                len(set(intervals.keys()) - set(default_intervals.keys())) == 0
             ), f"The intervals parameter has invalid keys"
             default_intervals.update(intervals)
         intervals = [default_intervals[col] for col in cols]
@@ -130,7 +130,7 @@ def generate_fake_dataframe(size, cols, col_names=None, intervals=None, seed=Non
                 if isinstance(cat_family, cycle):
                     cat_family = next(cat_family)
                 assert (
-                        cat_family in categories_dict.keys()
+                    cat_family in categories_dict.keys()
                 ), f"There are no samples for category '{cat_family}'. Consider passing a list of samples or use one of the available categories: {categories_dict.keys()}"
                 categories = rng.choice(
                     categories_dict[cat_family], length, replace=False, shuffle=True

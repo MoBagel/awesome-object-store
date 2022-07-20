@@ -1,11 +1,12 @@
+import tempfile
 from typing import Optional
 
 import pytest
+from pydantic import BaseSettings, Field
 
 from awesome_object_store import GoogleCloudStore
 from awesome_object_store.minio import MinioStore
 from tests import generate_fake_dataframe
-from pydantic import BaseSettings, Field
 
 
 class TestSettings(BaseSettings):
@@ -57,11 +58,15 @@ def minio_store(settings):
 def google_application_credentials():
     return "./tests/service-account.json"
 
+
 @pytest.fixture
 def google_cloud_store(monkeypatch, google_application_credentials, settings):
     monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", google_application_credentials)
     return GoogleCloudStore(bucket=settings.minio_bucket)
 
+
 @pytest.fixture
 def test_file_name():
-    return "test.txt"
+    file = tempfile.NamedTemporaryFile()
+    file.close()
+    return file.name

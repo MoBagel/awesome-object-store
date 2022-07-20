@@ -1,9 +1,9 @@
 import pytest
 
-from awesome_object_store import init_object_store, GoogleCloudStore, MinioStore
+from awesome_object_store import GoogleCloudStore, MinioStore, init_object_store
 
 
-def test_init_object_store(monkeypatch, settings,google_application_credentials):
+def test_init_object_store(monkeypatch, settings, google_application_credentials):
     monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", google_application_credentials)
     google_cloud_store = init_object_store(
         bucket=settings.minio_bucket,
@@ -20,5 +20,3 @@ def test_init_object_store(monkeypatch, settings,google_application_credentials)
         region=settings.minio_region,
     )
     assert isinstance(minio_store, MinioStore)
-
-

@@ -37,7 +37,7 @@ google-cloud-storage = "^2.3.0"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
 pytest-cov = "^3.0.0"
-black = "~=22.1.0"
+black = "~=22.6.0"
 flake8 = "^4.0.0"
 isort = "^5.10.1"
 mypy = "^0.910"
@@ -58,11 +58,11 @@ ROOT = 'awesome_object_store'
 mypy-install-type = 'mypy $ROOT --ignore-missing-imports --install-types --non-interactive'
 mypy = 'mypy $ROOT --ignore-missing-imports'
 autoflake-check = 'autoflake $ROOT -r'
-autoflake = 'autoflake --in-place $ROOT -r'
+autoflake = 'autoflake --in-place $ROOT tests -r'
 isort-check = 'isort $ROOT --diff'
-isort = 'isort $ROOT'
+isort = 'isort $ROOT tests'
 black-check = 'black $ROOT --diff'
-black = 'black $ROOT'
+black = 'black $ROOT tests'
 format-check = ['autoflake-check', 'isort-check', 'black-check']
 format = ['autoflake', 'isort', 'black']
 lint = ['mypy-install-type', 'mypy', 'black-check']

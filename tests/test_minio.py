@@ -108,6 +108,6 @@ async def test_fget_df(minio_store, test_dataframe):
         assert df is None
 
 
-async def test_list_objects_with_invalid_args(minio_store,test_dict):
+async def test_list_objects_with_invalid_args(minio_store, test_dict):
     with pytest.raises(Exception):
         minio_store.list_objects("", start_offset="2", end_offset="4")

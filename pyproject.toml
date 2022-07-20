@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awesome-object-store"
-version = "2.0.3"
+version = "2.1.0"
 license = "Apache-2.0"
 readme = "README.md"
 description = "minio wrapper to perform task like pandas dataframe upload, download"

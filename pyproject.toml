@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awesome-object-store"
-version = "2.1.0"
+version = "2.1.1"
 license = "Apache-2.0"
 readme = "README.md"
 description = "minio wrapper to perform task like pandas dataframe upload, download"
@@ -31,7 +31,7 @@ include = [
 python = "~=3.8"
 minio = "^7.1.1"
 pandas = "^1.4.1"
-starlette = "0.16.0"
+starlette = "^0.16.0"
 google-cloud-storage = "^2.3.0"
 
 [tool.poetry.dev-dependencies]

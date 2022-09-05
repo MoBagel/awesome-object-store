@@ -31,7 +31,7 @@ include = [
 python = "~=3.8"
 minio = "^7.1.1"
 pandas = "^1.4.1"
-starlette = "^0.16.0"
+starlette = ">=0.16.0"
 google-cloud-storage = "^2.3.0"
 
 [tool.poetry.dev-dependencies]

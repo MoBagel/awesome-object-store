@@ -12,16 +12,11 @@ function run_minio_server() {
     tests/minio server /tmp/fs --address $MINIO_ADDRESS >tests/minio.log 2>&1 &
 }
 
-function run_mongo() {
-   docker run --name awesome-mongo --rm -p 27000:27017 -d mongo:4.4.10
-}
-
 if [ -z ${SERVER_ENDPOINT+x} ]; then
     run_minio_server
     MINIO_PID=$!
     trap 'kill -9 ${MINIO_PID} 2>/dev/null' INT
     trap 'docker rm -f awesome-mongo' INT
-    run_mongo
 fi
 
 export MONGODB_DNS=mongodb://localhost:27000/beanie_db

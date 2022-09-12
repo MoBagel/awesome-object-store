@@ -18,5 +18,6 @@ def test_init_object_store(monkeypatch, settings, google_application_credentials
         secret_key=settings.minio_secret_key,
         secure=settings.minio_secure,
         region=settings.minio_region,
+        protocol="minio",
     )
     assert isinstance(minio_store, MinioStore)

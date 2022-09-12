@@ -1,4 +1,3 @@
-import os
 from logging import Logger
 from typing import Optional
 
@@ -15,8 +14,9 @@ def init_object_store(
     secure: bool = False,
     region: str = None,
     logger: Optional[Logger] = None,
+    protocol: Optional[str] = "gcs",
 ) -> BaseObjectStore:
-    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", None) is not None:
+    if protocol == "gcs":
         return GoogleCloudStore(bucket, logger)
     else:
         return MinioStore(

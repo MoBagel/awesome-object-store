@@ -113,8 +113,8 @@ class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
         name: str,
         column_types: dict = {},
         date_columns: List[str] = [],
-        usecols: List = None,
-        converters: dict = None,
+        usecols: Optional[List] = None,
+        converters: Optional[dict] = None,
     ) -> Optional[pd.DataFrame]:
         """Gets data of an object and return a dataframe."""
         try:

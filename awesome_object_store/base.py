@@ -109,8 +109,8 @@ class BaseObjectStore(Generic[BucketType, BlobType], ABC):
         file: UploadFile,
         column_types: dict = {},
         date_columns: List[str] = [],
-        usecols: List = None,
-        converters: dict = None,
+        usecols: Optional[List] = None,
+        converters: Optional[dict] = None,
     ) -> Optional[pd.DataFrame]:
         try:
             file_io = StringIO(str(file.file.read(), "utf-8"))

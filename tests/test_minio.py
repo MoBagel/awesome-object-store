@@ -2,6 +2,7 @@ import os
 import tempfile
 
 import pytest
+import pandas as pd
 from starlette.datastructures import UploadFile
 
 
@@ -64,6 +65,10 @@ def test_put_get_and_download_df(minio_store, test_dataframe):
     assert df.shape[0] == 100
     df = minio_store.get_df("not_exist.csv", date_columns=["column_4_date"])
     assert df is None
+    df = minio_store.get_df("test.csv", usecols=["column_4_date"])
+    assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
+    df = minio_store.get_df("test.csv", converters={"column_4_date": str})
+    assert pd.api.types.is_string_dtype(df["column_4_date"].dtype)
 
     minio_store.download("test.csv", "test.csv")
     assert os.path.exists("test.csv")
@@ -103,9 +108,14 @@ async def test_fget_df(minio_store, test_dataframe):
         await upload_file.seek(0)
         df = minio_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df.shape[0] == 100
+        df = minio_store.fget_df(upload_file, usecols=["column_4_date"])
+        assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
+        df = minio_store.fget_df(upload_file, converters={"column_4_date": str})
+        assert pd.api.types.is_string_dtype(df["column_4_date"].dtype)
         upload_file = UploadFile("non_exist")
         df = minio_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df is None
+        
 
 
 async def test_list_objects_with_invalid_args(minio_store, test_dict):

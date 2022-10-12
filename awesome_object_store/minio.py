@@ -113,6 +113,8 @@ class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
         name: str,
         column_types: dict = {},
         date_columns: List[str] = [],
+        usecols: List = None,
+        converters: dict = None,
     ) -> Optional[pd.DataFrame]:
         """Gets data of an object and return a dataframe."""
         try:
@@ -122,9 +124,9 @@ class MinioStore(BaseObjectStore[Bucket, HTTPResponse]):
             return None
 
         if not date_columns:
-            df = pd.read_csv(file_obj, dtype=column_types)
+            df = pd.read_csv(file_obj, dtype=column_types, usecols=usecols, converters=converters)
         else:
-            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
+            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types, usecols=usecols, converters=converters)
         file_obj.close()
         file_obj.release_conn()
         return df

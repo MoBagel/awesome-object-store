@@ -120,10 +120,12 @@ async def test_fget_df(google_cloud_store, test_dataframe):
         await upload_file.seek(0)
         df = google_cloud_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df.shape[0] == 100
-        # df = google_cloud_store.fget_df(upload_file, usecols=["column_4_date"])
-        # assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
-        # df = google_cloud_store.fget_df(upload_file, converters={"column_4_date": str})
-        # assert pd.api.types.is_string_dtype(df["column_4_date"].dtype)
+        await upload_file.seek(0)
+        df = google_cloud_store.fget_df(upload_file, usecols=["column_4_date"])
+        assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
+        await upload_file.seek(0)
+        df = google_cloud_store.fget_df(upload_file, converters={"column_3_int": str})
+        assert pd.api.types.is_string_dtype(df["column_3_int"].dtype)
         upload_file = UploadFile("non_exist")
         df = google_cloud_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df is None

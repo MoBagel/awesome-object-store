@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+import pandas as pd
 from starlette.datastructures import UploadFile
 
 
@@ -70,6 +71,10 @@ def test_put_get_and_download_df(google_cloud_store, test_dataframe, test_file_n
     assert df.shape[0] == 100
     df = google_cloud_store.get_df("not_exist.csv", date_columns=["column_4_date"])
     assert df is None
+    df = google_cloud_store.get_df(test_file_name, usecols=["column_4_date"])
+    assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
+    df = google_cloud_store.get_df(test_file_name, converters={"column_4_date": str})
+    assert pd.api.types.is_string_dtype(df["column_4_date"].dtype)
 
     google_cloud_store.download(test_file_name, "test.csv")
     assert os.path.exists("test.csv")
@@ -115,6 +120,12 @@ async def test_fget_df(google_cloud_store, test_dataframe):
         await upload_file.seek(0)
         df = google_cloud_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df.shape[0] == 100
+        await upload_file.seek(0)
+        df = google_cloud_store.fget_df(upload_file, usecols=["column_4_date"])
+        assert (df.shape[1] == 1) & (df.columns[0] == "column_4_date")
+        await upload_file.seek(0)
+        df = google_cloud_store.fget_df(upload_file, converters={"column_3_int": str})
+        assert pd.api.types.is_string_dtype(df["column_3_int"].dtype)
         upload_file = UploadFile("non_exist")
         df = google_cloud_store.fget_df(upload_file, date_columns=["column_4_date"])
         assert df is None

@@ -125,6 +125,8 @@ class GoogleCloudStore(BaseObjectStore[Bucket, Blob]):
         name: str,
         column_types: dict = {},
         date_columns: List[str] = [],
+        usecols: Optional[List] = None,
+        converters: Optional[dict] = None,
     ) -> Optional[pd.DataFrame]:
         """Gets data of an object and return a dataframe."""
         try:
@@ -133,9 +135,17 @@ class GoogleCloudStore(BaseObjectStore[Bucket, Blob]):
             self.logger.warning(e)
             return None
         if not date_columns:
-            df = pd.read_csv(file_obj, dtype=column_types)
+            df = pd.read_csv(
+                file_obj, dtype=column_types, usecols=usecols, converters=converters
+            )
         else:
-            df = pd.read_csv(file_obj, parse_dates=date_columns, dtype=column_types)
+            df = pd.read_csv(
+                file_obj,
+                parse_dates=date_columns,
+                dtype=column_types,
+                usecols=usecols,
+                converters=converters,
+            )
         return df
 
     def exists(self, name: str) -> bool:

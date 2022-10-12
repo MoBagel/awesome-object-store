@@ -114,7 +114,13 @@ class BaseObjectStore(Generic[BucketType, BlobType], ABC):
     ) -> Optional[pd.DataFrame]:
         try:
             file_io = StringIO(str(file.file.read(), "utf-8"))
-            df = pd.read_csv(file_io, dtype=column_types, parse_dates=date_columns, usecols=usecols, converters=converters)
+            df = pd.read_csv(
+                file_io,
+                dtype=column_types,
+                parse_dates=date_columns,
+                usecols=usecols,
+                converters=converters,
+            )
             file_io.close()
         except Exception as e:
             self.logger.warning("unable to read csv %s" % str(e))

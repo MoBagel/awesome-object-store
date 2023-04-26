@@ -102,7 +102,7 @@ def test_remove_object_objects_and_dir(minio_store, test_dict):
 async def test_fget_df(minio_store, test_dataframe):
     with tempfile.NamedTemporaryFile() as temp:
         test_dataframe.to_csv(temp.name, index=False)
-        upload_file = UploadFile(temp.name, temp)
+        upload_file = UploadFile(temp, filename=temp.name)
         df = minio_store.fget_df(upload_file)
         assert df.shape[0] == 100
         await upload_file.seek(0)
